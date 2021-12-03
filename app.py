@@ -1,51 +1,36 @@
 import dash
-from dash import dcc # dash core components
-from dash import html
+import dash_html_components as html
+import dash_pivottable
+import pandas as pd
+from dash import dash_table
 
-from dash.dependencies import Input, Output
-
-import numpy as np
-import sympy
+df = pd.read_csv('https://bit.ly/elements-periodic-table')
+def identity(x): return x
+df2 = df.pivot_table(
+            index='Period',
+            columns='Group', 
+            values='Element',
+            aggfunc=identity,
+        )
 
 app = dash.Dash(__name__)
+server = app.server
+
 
 app.layout = html.Div(
-    className="main",
-    children=[
-        html.H2("Grapher"),
-        dcc.Input(id="input", value='x**2'),
-        dcc.Graph(
-            id='graph',
-            figure={
-                'data': [
-                    {'x': np.linspace(0, 3, 100),
-                     'y': np.linspace(0, 3, 100)**2,
-                     'type': 'line'},
-                ]
-            }
-        )
-    ]
+    dash_pivottable.PivotTable(
+        data=[
+            ['Animal', 'Count', 'Location'],
+            ['Zebra', 5, 'SF Zoo'],
+            ['Tiger', 3, 'SF Zoo'],
+            ['Zebra', 2, 'LA Zoo'],
+            ['Tiger', 4, 'LA Zoo'],
+        ],
+        cols=["Animal"],
+        rows=["Location"],
+        vals=["Count"]
+    )
 )
 
-@app.callback(
-    Output(component_id='graph', component_property='figure'),
-    Input(component_id='input', component_property='value')
-)
-def update_graph(input_expression):
-    try:
-        x = sympy.symbols("x")
-        f = sympy.lambdify(
-            x,
-            sympy.parse_expr(input_expression),
-        )
-        return {
-            'data': [
-                {'x': np.linspace(0, 3, 100),
-                 'y': [f(x) for x in np.linspace(0, 3, 100)],
-                 'type': 'line'},
-            ]
-        }
-    except:
-        return {}
-
-app.run_server(debug=True, host="0.0.0.0")
+if __name__ == "__main__":
+    app.run_server(debug=True)
