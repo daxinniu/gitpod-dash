@@ -59,7 +59,7 @@ app.layout = html.Div([
 def update_cols(index_val, columns_val, values_val):
     if index_val == columns_val or index_val == values_val or values_val == columns_val:
         print("Inputs must all be different!")
-        return {}
+        return None, None
     temp = df.pivot_table(
         index=index_val,
         columns=columns_val, 
