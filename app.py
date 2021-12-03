@@ -22,18 +22,22 @@ app = dash.Dash(__name__)
 
 
 app.layout = html.Div([
+    html.H2("Pivot Table"),
+    html.H4("Index"),
     dcc.Dropdown(
         id="index-dropdown",
         options=[{'label': i, 'value': i} for i in df.columns],
         multi=False,
         value="Period"
     ),
+    html.H4("Columns"),
     dcc.Dropdown(
         id="columns-dropdown",
         options=[{'label': i, 'value': i} for i in df.columns],
         multi=False,
         value="Group"
     ),
+    html.H4("Values"),
     dcc.Dropdown(
         id="values-dropdown",
         options=[{'label': i, 'value': i} for i in df.columns],
