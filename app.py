@@ -2,7 +2,7 @@ import dash
 from dash import dcc
 from dash import html
 from dash import dash_table
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 import dash_pivottable
 import plotly.express as px
 import pandas as pd
@@ -40,6 +40,7 @@ app.layout = html.Div([
         multi=False,
         value="Element"
     ),
+    html.Button(id='submit-button-state', n_clicks=0, children='Submit'),
     dash_table.DataTable(
     id='table',
     columns=[{"name": i, "id": i} for i in df3.columns],
@@ -52,11 +53,12 @@ app.layout = html.Div([
     Output('table', 'columns')
     ], 
     [
-        Input('index-dropdown', 'value'),
-        Input('columns-dropdown', 'value'),
-        Input('values-dropdown', 'value'),
+        Input('submit-button-state', 'n_clicks'),
+        State('index-dropdown', 'value'),
+        State('columns-dropdown', 'value'),
+        State('values-dropdown', 'value'),
     ])
-def update_cols(index_val, columns_val, values_val):
+def update_cols(n_clicks, index_val, columns_val, values_val):
     if index_val == columns_val or index_val == values_val or values_val == columns_val:
         print("Inputs must all be different!")
         return None, None
