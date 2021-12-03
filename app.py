@@ -1,38 +1,51 @@
 import dash
-from dash import dcc
+from dash import dcc # dash core components
 from dash import html
+
 from dash.dependencies import Input, Output
-import plotly.express as px
 
-import pandas as pd
-
-df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/gapminderDataFiveYear.csv')
+import numpy as np
+import sympy
 
 app = dash.Dash(__name__)
 
-app.layout = html.Div([
-    dcc.Graph(id='graph-with-slider'),
-    dcc.Slider(
-        id='year-slider',
-        min=df['year'].min(),
-        max=df['year'].max(),
-        value=df['year'].min(),
-        marks={str(year): str(year) for year in df['year'].unique()},
-        step=None
-    )
-])
+app.layout = html.Div(
+    className="main",
+    children=[
+        html.H2("Grapher"),
+        dcc.Input(id="input", value='x**2'),
+        dcc.Graph(
+            id='graph',
+            figure={
+                'data': [
+                    {'x': np.linspace(0, 3, 100),
+                     'y': np.linspace(0, 3, 100)**2,
+                     'type': 'line'},
+                ]
+            }
+        )
+    ]
+)
 
 @app.callback(
-    Output('graph-with-slider', 'figure'),
-    Input('year-slider', 'value'))
-def update_figure(selected_year):
-    filtered_df = df[df.year == selected_year]
+    Output(component_id='graph', component_property='figure'),
+    Input(component_id='input', component_property='value')
+)
+def update_graph(input_expression):
+    try:
+        x = sympy.symbols("x")
+        f = sympy.lambdify(
+            x,
+            sympy.parse_expr(input_expression),
+        )
+        return {
+            'data': [
+                {'x': np.linspace(0, 3, 100),
+                 'y': [f(x) for x in np.linspace(0, 3, 100)],
+                 'type': 'line'},
+            ]
+        }
+    except:
+        return {}
 
-    fig = px.scatter(filtered_df, x="gdpPercap", y="lifeExp",
-                     size="pop", color="continent", hover_name="country",
-                     log_x=True, size_max=55)
-    fig.update_layout(transition_duration=500)
-    return fig
-
-if __name__ == '__main__':
-    app.run_server(debug=True)
+app.run_server(debug=True, host="0.0.0.0")
