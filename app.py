@@ -18,6 +18,7 @@ df2 = df.pivot_table(
 )
 df3 = pd.DataFrame(df2.to_records())
 
+
 app = dash.Dash(__name__)
 
 
