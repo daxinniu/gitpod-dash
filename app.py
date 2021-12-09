@@ -3,7 +3,6 @@ from dash import dcc
 from dash import html
 from dash import dash_table
 from dash.dependencies import Input, Output, State
-import dash_pivottable
 import plotly.express as px
 import pandas as pd
 
@@ -78,4 +77,4 @@ def update_cols(n_clicks, index_val, columns_val, values_val):
     return out_df.to_dict('records'), out_cols
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False, host="0.0.0.0", port=8080)
